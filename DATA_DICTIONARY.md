@@ -1,4 +1,48 @@
-# Data Catalog for Gold Layer
+# Data Dictionary
+
+## Layered architecture
+
+| Layer | Purpose | Main objects |
+|---|---|---|
+| **Source** | Raw CRM and ERP CSV exports. | `datasets/source_crm`, `datasets/source_erp` |
+| **Bronze** | Raw ingestion with source-aligned columns and minimal transformation. | `bronze.crm_*`, `bronze.erp_*` |
+| **Silver** | Cleaned, standardized, typed, and enriched data. | `silver.crm_*`, `silver.erp_*` |
+| **Gold** | Business-ready star schema for reporting and BI. | `gold.dim_customers`, `gold.dim_products`, `gold.fact_sales` |
+
+## Source layer
+
+| Source | Files | Loaded into |
+|---|---|---|
+| CRM | `cust_info.csv`, `prd_info.csv`, `sales_details.csv` | `bronze.crm_cust_info`, `bronze.crm_prd_info`, `bronze.crm_sales_details` |
+| ERP | `CUST_AZ12.csv`, `LOC_A101.csv`, `PX_CAT_G1V2.csv` | `bronze.erp_cust_az12`, `bronze.erp_loc_a101`, `bronze.erp_px_cat_g1v2` |
+
+## Bronze layer
+
+The Bronze layer preserves source structures for traceability and repeatable reloads.
+
+| Table | Grain | Main columns |
+|---|---|---|
+| `bronze.crm_cust_info` | One row per CRM customer record | `cst_id`, `cst_key`, `cst_firstname`, `cst_lastname`, `cst_marital_status`, `cst_gndr`, `cst_create_date` |
+| `bronze.crm_prd_info` | One row per CRM product record/version | `prd_id`, `prd_key`, `prd_nm`, `prd_cost`, `prd_line`, `prd_start_dt`, `prd_end_dt` |
+| `bronze.crm_sales_details` | One row per sales order line | `sls_ord_num`, `sls_prd_key`, `sls_cust_id`, `sls_order_dt`, `sls_ship_dt`, `sls_due_dt`, `sls_sales`, `sls_quantity`, `sls_price` |
+| `bronze.erp_cust_az12` | One row per ERP customer record | `cid`, `bdate`, `gen` |
+| `bronze.erp_loc_a101` | One row per ERP customer-location record | `cid`, `cntry` |
+| `bronze.erp_px_cat_g1v2` | One row per ERP product-category record | `id`, `cat`, `subcat`, `maintenance` |
+
+## Silver layer
+
+The Silver layer keeps the source naming where useful, adds `dwh_create_date`, and stores cleaned values used by the Gold views.
+
+| Table | Grain | Transformations / important columns |
+|---|---|---|
+| `silver.crm_cust_info` | One row per latest CRM customer record | Standardized customer text and demographics; `dwh_create_date` audit timestamp. |
+| `silver.crm_prd_info` | One row per product version | Derived `cat_id`; typed `prd_start_dt` and `prd_end_dt`; `dwh_create_date`. |
+| `silver.crm_sales_details` | One row per sales order line | Converts integer dates to `DATE`; retains sales, quantity, and price measures. |
+| `silver.erp_cust_az12` | One row per ERP customer record | Standardized customer key, birthdate, and gender; `dwh_create_date`. |
+| `silver.erp_loc_a101` | One row per customer-location record | Standardized country values; `dwh_create_date`. |
+| `silver.erp_px_cat_g1v2` | One row per product-category record | Standardized category, subcategory, and maintenance values; `dwh_create_date`. |
+
+## Gold layer
 
 ## Overview
 The Gold Layer is the business-level data representation, structured to support analytical and reporting use cases. It consists of **dimension tables** and **fact tables** for specific business metrics.

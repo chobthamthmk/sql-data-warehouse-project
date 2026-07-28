@@ -27,11 +27,11 @@ Operational sales data often lives in separate systems and inconsistent file ext
 
 This project follows the Medallion Architecture pattern:
 
-| Layer | Purpose | Key Assets |
-|---|---|---|
-| `bronze` | Raw ingestion of source data with minimal transformation | Source-aligned tables, `bronze.load_bronze` |
-| `silver` | Data cleansing, standardization, deduplication, and enrichment | Cleaned tables, `silver.load_silver` |
-| `gold` | Business-ready analytical model for reporting | `gold.dim_customers`, `gold.dim_products`, `gold.fact_sales` |
+| Layer      | Purpose                                                        | Key Assets                                                         |
+| ---------- | -------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `bronze` | Raw ingestion of source data with minimal transformation       | Source-aligned tables,`bronze.load_bronze`                       |
+| `silver` | Data cleansing, standardization, deduplication, and enrichment | Cleaned tables,`silver.load_silver`                              |
+| `gold`   | Business-ready analytical model for reporting                  | `gold.dim_customers`, `gold.dim_products`, `gold.fact_sales` |
 
 ## Data Pipeline
 
@@ -72,21 +72,21 @@ The final analytical model is intentionally simple and reporting-friendly:
 - `dim_products` contains product, category, subcategory, cost, and product line details
 - `fact_sales` stores order-level sales measures such as quantity, price, and sales amount
 
-Additional metadata for the Gold layer is documented in [docs/data_catalog.md](docs/data_catalog.md).
+The full layered data dictionary—from source files through Bronze, Silver, and Gold—is documented in [DATA_DICTIONARY.md](DATA_DICTIONARY.md).
 
 ## Repository Structure
 
 ```text
 sql-data-warehouse-project/
-├── datasets/                          
+├── datasets/                        
 |   ├── source_crm/
 |   ├── source_erp/
-├── docs/                              
-|   ├── data-flow.png                    
-|   ├── data-model.png                    
-|   ├── data_integration.png             
+├── docs/                            
+|   ├── data-flow.png                  
+|   ├── data-model.png                  
+|   ├── data_integration.png           
 |   ├── high-level-architecture.png
-|   ├── data_catalog.md
+|   ├── DATA_DICTIONARY.md
 |   ├── naming_conventions.md
 ├── scripts/
 |   ├── init_database.sql
@@ -149,16 +149,15 @@ The project includes SQL test scripts to validate:
 
 ## Documentation
 
-- [Data Catalog](docs/data_catalog.md)
+- [Layered Data Dictionary](DATA_DICTIONARY.md)
 - [Naming Conventions](docs/naming_conventions.md)
+  
+##  Credits
 
-  ## Credits
-
-This project was built following a tutorial by **[Data with Baraa](https://www.youtube.com/@DataWithBaraa)**. 
+This project was built following a tutorial by **[Data with Baraa](https://www.youtube.com/@DataWithBaraa)**.
 
 - **Tutorial Link**: [SQL Data Warehouse from Scratch | Full Hands-On Data Engineering Project](https://www.youtube.com/watch?v=9GVqKuTVANE)
 - **Author**: [Data with Baraa](https://www.youtube.com/@DataWithBaraa)
-
 
 ## License
 
